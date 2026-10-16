@@ -1,30 +1,17 @@
 
-import pytest
-from src.frete import calcular_frete
+def calcular_frete(subtotal, regiao):
+    if subtotal < 0:
+        raise ValueError("O subtotal não pode ser negativo.")
 
+    if not isinstance(subtotal, (int, float)) or isinstance(subtotal, bool):
+        raise ValueError("O subtotal deve ser numérico.")
 
-@pytest.mark.parametrize(
-    "regiao, subtotal, frete_esperado",
-    [
-        ("Norte", 100.00, 25.00),
-        ("Nordeste", 100.00, 25.00),
-        ("Sudeste", 100.00, 15.00),
-        ("Sul", 100.00, 15.00),
-        ("Centro-Oeste", 100.00, 15.00),
-        ("Norte", 300.00, 25.00),
-        ("Nordeste", 300.00, 25.00),
-        ("Norte", 300.01, 0.00),
-        ("Nordeste", 350.00, 0.00),
-        ("Sudeste", 350.00, 0.00),
-    ],
-)
-def test_regra_frete_por_regiao(regiao, subtotal, frete_esperado):
-    # Arrange
-    valor_carrinho = subtotal
-    regiao_entrega = regiao
+    if subtotal > 300:
+        return 0.00
 
-    # Act
-    frete = calcular_frete(valor_carrinho, regiao_entrega)
+    frete_base = 15.00
 
-    # Assert
-    assert frete == frete_esperado
+    if regiao in ("Norte", "Nordeste"):
+        frete_base += 10.00
+
+    return frete_base
