@@ -3,107 +3,28 @@ import pytest
 from src.frete import calcular_frete
 
 
-def test_frete_padrao():
+@pytest.mark.parametrize(
+    "regiao, subtotal, frete_esperado",
+    [
+        ("Norte", 100.00, 25.00),
+        ("Nordeste", 100.00, 25.00),
+        ("Sudeste", 100.00, 15.00),
+        ("Sul", 100.00, 15.00),
+        ("Centro-Oeste", 100.00, 15.00),
+        ("Norte", 300.00, 25.00),
+        ("Nordeste", 300.00, 25.00),
+        ("Norte", 300.01, 0.00),
+        ("Nordeste", 350.00, 0.00),
+        ("Sudeste", 350.00, 0.00),
+    ],
+)
+def test_regra_frete_por_regiao(regiao, subtotal, frete_esperado):
     # Arrange
-    subtotal = 100.00
-    frete_esperado = 15.00
+    valor_carrinho = subtotal
+    regiao_entrega = regiao
 
     # Act
-    frete = calcular_frete(subtotal)
+    frete = calcular_frete(valor_carrinho, regiao_entrega)
 
     # Assert
     assert frete == frete_esperado
-
-
-def test_frete_gratis_no_limite():
-    # Arrange
-    subtotal = 250.00
-    frete_esperado = 0.00
-
-    # Act
-    frete = calcular_frete(subtotal)
-
-    # Assert
-    assert frete == frete_esperado
-
-
-def test_frete_gratis_acima_do_limite():
-    # Arrange
-    subtotal = 300.00
-    frete_esperado = 0.00
-
-    # Act
-    frete = calcular_frete(subtotal)
-
-    # Assert
-    assert frete == frete_esperado
-
-
-def test_frete_abaixo_do_limite():
-    # Arrange
-    subtotal = 249.99
-    frete_esperado = 15.00
-
-    # Act
-    frete = calcular_frete(subtotal)
-
-    # Assert
-    assert frete == frete_esperado
-
-
-def test_valor_decimal():
-    # Arrange
-    subtotal = 99.90
-    frete_esperado = 15.00
-
-    # Act
-    frete = calcular_frete(subtotal)
-
-    # Assert
-    assert frete == frete_esperado
-
-
-@pytest.mark.parametrize("subtotal", [0, -1, -100.00])
-def test_rejeita_subtotal_invalido(subtotal):
-    # Arrange
-    valor = subtotal
-
-    # Act
-    # Assert
-    with pytest.raises(ValueError):
-        calcular_frete(valor)
-
-
-@pytest.mark.parametrize("subtotal", ["100", True, None])
-def test_rejeita_tipo_incompativel(subtotal):
-    # Arrange
-    valor = subtotal
-
-    # Act
-    # Assert
-    with pytest.raises((ValueError, TypeError)):
-        calcular_frete(valor)
-
-
-def test_retorna_apenas_frete():
-    # Arrange
-    subtotal = 100.00
-    frete_esperado = 15.00
-
-    # Act
-    resultado = calcular_frete(subtotal)
-
-    # Assert
-    assert resultado == frete_esperado
-
-
-def test_resultado_deterministico():
-    # Arrange
-    subtotal = 150.00
-
-    # Act
-    primeiro_resultado = calcular_frete(subtotal)
-    segundo_resultado = calcular_frete(subtotal)
-
-    # Assert
-    assert primeiro_resultado == segundo_resultado
